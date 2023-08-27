@@ -1,9 +1,19 @@
-import pprint
-from fastapi import FastAPI, HTTPException, dependencies
+# Tty Cacth
+# try:
+#     users = user_serializer(UserDB.find())
+#     return users
+# except Exception as ex:
+#     raise ex
+
+
+from bson import ObjectId
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.encoders import jsonable_encoder
 from pymongo import MongoClient
 from starlette import status
-
+from bson import json_util
+import json
+from pymongo import ReturnDocument
 from auth.jwtHandler import singJWT
 from auth.jwtBearer import jwtBearer
 
@@ -66,7 +76,8 @@ async def create_user(user: UserRequest):
     findEmail = UserDB.find_one({"email": newUser["email"]})
     if not findEmail:
         if newUser["password"] == newUser["confirmPassword"]:
-            return await add_user(newUser)
+            await add_user(newUser)
+            return singJWT(user.email)
         else:
             raise HTTPException(
                 status_code=422, detail="password and confrimPassword must same")
@@ -85,13 +96,13 @@ async def handel_login(User: UserLoginRequest):
             status_code=404, detail="User is not registered with this email")
 
     if findUser["password"] == user["password"]:
-        return "pass is ok"
+        return singJWT(findUser["email"])
     else:
         return "pass not mach"
 
 
 # 3 Add Post
-@app.post("/posts", tags=["post"], status_code=status.HTTP_201_CREATED)
+@app.post("/posts", dependencies=[Depends(jwtBearer())], tags=["post"], status_code=status.HTTP_201_CREATED)
 async def create_post(post: PostSchema):
     newPost = jsonable_encoder(post)
     return await add_post(newPost)
@@ -100,6 +111,9 @@ async def create_post(post: PostSchema):
 # 4 Get All Post
 @app.get("/get-all-post", tags=["post"], status_code=status.HTTP_200_OK)
 async def get_all_post():
+    if PostDB.count_documents({}) == 0:
+        raise HTTPException(status_code=404, detail="No Post In DB")
+
     posts = post_serializer(PostDB.find())
     return posts
 
@@ -107,11 +121,34 @@ async def get_all_post():
 # 5 Get All User
 @app.get("/get-all-user", tags=["user"], status_code=status.HTTP_200_OK)
 async def get_all_user():
+    if UserDB.count_documents({}) == 0:
+        raise HTTPException(status_code=404, detail="No Post In DB")
     users = user_serializer(UserDB.find())
     return users
 
-    # try:
-    #     users = user_serializer(UserDB.find())
-    #     return users
-    # except Exception as ex:
-    #     raise ex
+
+# 6 Get User By Id
+@app.get("/get-post-by-id/{id}", tags=["post"], status_code=status.HTTP_200_OK)
+async def get_post_by_id(id: str):
+    post = PostDB.find_one({"_id": ObjectId(id)})
+    response = json.loads(json_util.dumps(post))
+    return response
+
+
+#! Complete This Error Handelr
+# 7 Upadate Post
+@app.put("/posts/update_post/{id}", dependencies=[Depends(jwtBearer())], tags=["post"], status_code=status.HTTP_200_OK)
+async def update_post(id: str, post: PostSchema):
+    if PostDB.find_one({"_id": ObjectId(id)}):
+        post = PostDB.find_one_and_update({"_id": ObjectId(id)}, {
+            "$set": dict(post)
+        })
+    else:
+        raise HTTPException(status_code=404, detail="not found")
+
+
+#! Complete This Error Handelr
+# 8 Delete Post
+@app.delete("/posts/delete_post/{id}", dependencies=[Depends(jwtBearer())], tags=["post"], status_code=status.HTTP_200_OK)
+async def delete_post(id: str):
+    PostDB.find_one_and_delete({"_id": ObjectId(id)})
