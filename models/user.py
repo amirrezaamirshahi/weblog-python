@@ -1,7 +1,7 @@
-from ast import List
 from typing import Optional
-
 from pydantic import BaseModel, EmailStr, Field
+
+#! Email Validation
 
 
 class UserRequest(BaseModel):
@@ -21,7 +21,8 @@ class UserRequest(BaseModel):
                 "fullname": "Amir Amirshahi",
                 "email": "jdoe@x.edu.ng",
                 "password": "amir123",
-                "confirmPassword": "amir123"
+                "confirmPassword": "amir123",
+                "tags": "[]"
             }
         }
 
@@ -33,10 +34,10 @@ class UserLoginRequest(BaseModel):
 
 
 class UserCompliteProfile(BaseModel):
-    age : Optional[str] = None
-    about : Optional[str] = None
-    WorkExperience : Optional[str] = None
-    educationalBackground : Optional[str] = None
+    age: Optional[str] = None
+    about: Optional[str] = None
+    WorkExperience: Optional[str] = None
+    educationalBackground: Optional[str] = None
 
     class Config:
         json_schema_extra = {

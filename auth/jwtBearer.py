@@ -1,10 +1,8 @@
 # The function of this file is to cheack wheather the req is authorized not [verification of the protecd route]
-
 from fastapi import Request, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from .jwtHandler import decodeJWT
-
 
 
 class jwtBearer(HTTPBearer):
