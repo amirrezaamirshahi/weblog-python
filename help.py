@@ -1,7 +1,18 @@
-from decouple import config
+from fastapi import FastAPI
+from pydantic import BaseModel
 
-JWT_SECRET = config("SECRET")
-JWT_ALGORITGM = config("ALGORITGM")
+app = FastAPI()
 
-print(JWT_SECRET)
-print(JWT_ALGORITGM)
+
+class Item(BaseModel):
+    name: str
+    description: str | None = None
+    price: float
+    tax: float | None = None
+    tags: list = []
+
+
+@app.put("/items/{item_id}")
+async def update_item(item_id: int, item: Item):
+    results = {"item_id": item_id, "item": item}
+    return results

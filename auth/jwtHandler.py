@@ -8,13 +8,10 @@ from decouple import config
 JWT_SECRET = config("SECRET")
 JWT_ALGORITGM = config("ALGORITGM")
 
+
 # Function returns the generated Tokens (JWT)
-
-
 def token_response(token: str):
-    return {
-        "sccess token": token
-    }
+    return token
 
 
 # Function used for signing the JWT string
@@ -33,3 +30,7 @@ def decodeJWT(token: str):
         return decode_token if decode_token['expires'] >= time.time() else None
     except:
         return {}
+
+
+def decodeJWTuser(token: str):
+    return jwt.decode(token, JWT_SECRET, algorithms=JWT_ALGORITGM)

@@ -1,3 +1,4 @@
+from ast import List
 from typing import Optional
 
 from pydantic import BaseModel, EmailStr, Field
@@ -8,19 +9,24 @@ class UserRequest(BaseModel):
     email: str
     password: str = Field(min_length=3)
     confirmPassword: str
+    tags: list = []
 
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "fullname": "Amir Amirshahi",
-                "email": "jdoe@x.edu.ng",
-                "password": "amir123",
-                "confirmPassword": "amir123"
-            }
-        }
+    # class Config:
+    #     json_schema_extra = {
+    #         "example": {
+    #             "fullname": "Amir Amirshahi",
+    #             "email": "jdoe@x.edu.ng",
+    #             "password": "amir123",
+    #             "confirmPassword": "amir123"
+    #         }
+    #     }
 
 
 class UserLoginRequest(BaseModel):
     # email: EmailStr = Field(default=None)
     email: str
     password: str = Field(min_length=3, default=None)
+
+
+# class UserTagsRequest(BaseModel):
+#     tags: List(str)

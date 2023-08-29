@@ -6,6 +6,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from .jwtHandler import decodeJWT
 
 
+
 class jwtBearer(HTTPBearer):
     def __init__(self, auto_Error: bool = True):
         super(jwtBearer, self).__init__(auto_error=auto_Error)
