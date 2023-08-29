@@ -19,7 +19,7 @@ from pymongo import ReturnDocument
 from auth.jwtHandler import singJWT, decodeJWTuser
 from auth.jwtBearer import jwtBearer
 
-from models.user import UserLoginRequest, UserRequest
+from models.user import UserLoginRequest, UserRequest, UserCompliteProfile
 from models.post import PostSchema
 
 
@@ -115,6 +115,21 @@ async def handel_login(User: UserLoginRequest):
         return "pass not mach"
 
 
+# Complete Profile
+@app.post("/user/complate_profile/{id}", dependencies=[Depends(jwtBearer())], tags=["user"])
+async def complete_profile(id: str, profile: UserCompliteProfile, token: Annotated[str, Depends(oauth2_scheme)]):
+    userID = decodeJWTuser(token)['userID']
+    if userID == id:
+        print("OK")
+        myquery = {"_id":  ObjectId(id)}
+        newvalues = {"$set": {"age": profile.age, "about": profile.about,
+                              "WorkExperience": profile.WorkExperience, "educationalBackground": profile.educationalBackground}}
+        UserDB.update_one(myquery, newvalues)
+    else:
+        raise HTTPException(
+            status_code=404, detail="you only can update your post")
+
+
 # Find Same Tags
 @app.get("/user/same_tags", dependencies=[Depends(jwtBearer())], tags=["user"])
 async def find_same_tags(token: Annotated[str, Depends(oauth2_scheme)]):
@@ -159,18 +174,6 @@ async def create_post(post: PostSchema, token: Annotated[str, Depends(oauth2_sch
     post.user = decodeJWTuser(token)['userID']
     newPost = jsonable_encoder(post)
     return await add_post(newPost)
-
-
-# # Comment For Post
-# @app.post("/posts/comment/{id}", tags=["post"], dependencies=[Depends(jwtBearer())], status_code=status.HTTP_200_OK)
-# async def comment(id: str, post: PostSchema, token: Annotated[str, Depends(oauth2_scheme)]):
-#     userID = decodeJWTuser(token)['userID']
-#     findPost = PostDB.find_one({"_id": ObjectId(id)})
-#     print(findPost)
-#     commentList = []
-#     commentList = findPost['comment']
-#     print(commentList)
-    
 
 
 # Updfate Post

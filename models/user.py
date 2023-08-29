@@ -10,16 +10,20 @@ class UserRequest(BaseModel):
     password: str = Field(min_length=3)
     confirmPassword: str
     tags: list = []
+    age: Optional[str] = None
+    about: Optional[str] = None
+    WorkExperience: Optional[str] = None
+    educationalBackground: Optional[str] = None
 
-    # class Config:
-    #     json_schema_extra = {
-    #         "example": {
-    #             "fullname": "Amir Amirshahi",
-    #             "email": "jdoe@x.edu.ng",
-    #             "password": "amir123",
-    #             "confirmPassword": "amir123"
-    #         }
-    #     }
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "fullname": "Amir Amirshahi",
+                "email": "jdoe@x.edu.ng",
+                "password": "amir123",
+                "confirmPassword": "amir123"
+            }
+        }
 
 
 class UserLoginRequest(BaseModel):
@@ -28,5 +32,18 @@ class UserLoginRequest(BaseModel):
     password: str = Field(min_length=3, default=None)
 
 
-# class UserTagsRequest(BaseModel):
-#     tags: List(str)
+class UserCompliteProfile(BaseModel):
+    age : Optional[str] = None
+    about : Optional[str] = None
+    WorkExperience : Optional[str] = None
+    educationalBackground : Optional[str] = None
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "age": "18",
+                "about": "i like sport",
+                "WorkExperience": "2 year in tehran",
+                "educationalBackground": "kashan uni"
+            }
+        }
